@@ -1,0 +1,12 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Issue photos — public read, authenticated write with size and type validation.
+    match /issues/{issueId}/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.resource.size < 5 * 1024 * 1024        // Max 5 MB per file
+                   && request.resource.contentType.matches('image/.*'); // Images only
+    }
+  }
+}
